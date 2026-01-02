@@ -30,7 +30,7 @@ export default function Sidebar() {
       isCollapsed ? "w-20" : "w-64"
     )}>
       {/* Logo Area */}
-      <div className="p-6 flex justify-center items-center border-b border-border/50 min-h-[100px]">
+      <div className="p-2 flex justify-center items-center border-b border-border/50">
         <div className="relative w-full flex justify-center items-center">
           {isCollapsed ? (
             <img 
@@ -62,7 +62,7 @@ export default function Sidebar() {
       </button>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto overflow-x-hidden">
+      <nav className="flex-1 px-4 py-2 space-y-2 overflow-y-auto overflow-x-hidden">
         {!isCollapsed && (
           <div className="px-4 mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 whitespace-nowrap overflow-hidden">
             Menu Principal
