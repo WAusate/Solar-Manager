@@ -14,6 +14,7 @@ import Reports from "@/pages/Reports";
 import Settings from "@/pages/Settings";
 import NotFound from "@/pages/not-found";
 import Sidebar from "@/components/Sidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 // Protected Route Component
 function ProtectedRoute({ 
@@ -42,12 +43,18 @@ function ProtectedRoute({
   }
 
   return (
-    <div className="flex bg-slate-50 min-h-screen">
-      <Sidebar />
-      <main className="flex-1 ml-64 min-h-screen overflow-y-auto">
-        <Component />
-      </main>
-    </div>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-slate-50">
+        <Sidebar />
+        <SidebarInset>
+          <div className="flex flex-col flex-1 h-screen overflow-hidden">
+            <main className="flex-1 overflow-y-auto">
+              <Component />
+            </main>
+          </div>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 }
 
