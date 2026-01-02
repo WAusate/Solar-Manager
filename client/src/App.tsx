@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
-
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import AdminPanel from "@/pages/AdminPanel";
@@ -44,9 +43,9 @@ function ProtectedRoute({
 
   return (
     <SidebarProvider>
-      <div className="flex bg-slate-50 min-h-screen w-full">
+      <div className="flex min-h-screen w-full">
         <Sidebar />
-        <main className="flex-1 min-h-screen overflow-y-auto transition-all duration-200">
+        <main className="flex-1 overflow-auto">
           <Component />
         </main>
       </div>
@@ -58,9 +57,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/login" component={Login} />
-      
-      {/* Default redirect based on role is handled in Login page or useAuth, 
-          but for root path we can redirect to login if no auth or dashboard if auth */}
+
       <Route path="/">
         {params => <Redirect to="/login" />}
       </Route>
