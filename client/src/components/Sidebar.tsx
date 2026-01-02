@@ -1,148 +1,202 @@
-import { useLocation, Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import {
-  LayoutDashboard,
-  FileText,
-  AlertCircle,
-  Settings,
-  LogOut,
-  Shield,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  Sidebar as SidebarUI,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import logoUrl from "@assets/grok-image-deixe_apenas_no_estilo_com_fundo_branco.-9102eb94-c_1767312477482.png";
+import { 
+  LayoutDashboard, 
+  FileText, 
+  Bell, 
+  Settings, 
+  ShieldCheck, 
+  LogOut,
+  Menu,
+  X
+} from "lucide-react";
+import { useState } from "react";
+import logo from "@assets/grok-image-deixe_apenas_no_estilo_com_fundo_branco.-9102eb94-c_1767312477482.png";
+import logoIcon from "@assets/logo-icon.png";
 
 export default function Sidebar() {
   const [location] = useLocation();
   const { user, logout } = useAuth();
-  const { state } = useSidebar();
-  const isCollapsed = state === "collapsed";
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const menuItems = [
-    {
-      title: "Dashboard",
-      icon: LayoutDashboard,
-      href: "/dashboard",
-      roles: ["admin", "client"],
-    },
-    {
-      title: "Painel Admin",
-      icon: Shield,
-      href: "/admin-panel",
-      roles: ["admin"],
-    },
-    {
-      title: "Relatórios",
-      icon: FileText,
-      href: "/reports",
-      roles: ["admin", "client"],
-    },
-    {
-      title: "Alertas",
-      icon: AlertCircle,
-      href: "/alerts",
-      roles: ["admin", "client"],
-    },
-    {
-      title: "Configurações",
-      icon: Settings,
-      href: "/settings",
-      roles: ["admin"],
-    },
-  ];
+  const isActive = (path: string) => location === path;
 
-  const filteredItems = menuItems.filter((item) =>
-    item.roles.includes(user?.role as string)
-  );
+  if (!user) return null;
 
   return (
-    <SidebarUI collapsible="icon" className="border-r border-slate-200">
-      <SidebarHeader className="p-4">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="flex-shrink-0">
-            <img src={logoUrl} alt="Gestão Solar" className="h-8 w-8 object-contain" />
+    <div className={cn(
+      "h-screen bg-white border-r border-border flex flex-col fixed left-0 top-0 z-50 shadow-xl shadow-slate-200/50 transition-all duration-300",
+      isCollapsed ? "w-20" : "w-64"
+    )}>
+      {/* Logo Area */}
+      <div className="p-6 flex justify-center items-center border-b border-border/50 relative">
+        {isCollapsed ? (
+          <img 
+            src={logoIcon} 
+            alt="Gestão Solar" 
+            className="h-10 w-10 object-contain drop-shadow-sm" 
+          />
+        ) : (
+          <img 
+            src={logo} 
+            alt="Gestão Solar" 
+            className="h-20 w-auto object-contain drop-shadow-sm" 
+          />
+        )}
+
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center shadow-md hover:bg-primary/90 transition-colors"
+          aria-label={isCollapsed ? "Expandir menu" : "Recolher menu"}
+        >
+          {isCollapsed ? <Menu className="w-3 h-3" /> : <X className="w-3 h-3" />}
+        </button>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-4 py-6 space-y-2">
+        {!isCollapsed && (
+          <div className="px-4 mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+            Menu Principal
           </div>
-          {!isCollapsed && (
-            <span className="font-display font-bold text-xl text-slate-900 truncate">
-              Gestão Solar
+        )}
+
+        {user.role === 'client' && (
+          <Link href="/dashboard" className={cn(
+            "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
+            isActive("/dashboard") 
+              ? "bg-primary/10 text-primary shadow-sm" 
+              : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
+            isCollapsed && "justify-center"
+          )}>
+            <LayoutDashboard className="w-5 h-5" />
+            {!isCollapsed && "Dashboard"}
+
+            {isCollapsed && (
+              <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                Dashboard
+              </span>
+            )}
+          </Link>
+        )}
+
+        {user.role === 'admin' && (
+          <Link href="/admin-panel" className={cn(
+            "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
+            isActive("/admin-panel") 
+              ? "bg-primary/10 text-primary shadow-sm" 
+              : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
+            isCollapsed && "justify-center"
+          )}>
+            <ShieldCheck className="w-5 h-5" />
+            {!isCollapsed && "Painel Admin"}
+
+            {isCollapsed && (
+              <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                Painel Admin
+              </span>
+            )}
+          </Link>
+        )}
+
+        <Link href="/reports" className={cn(
+          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
+          isActive("/reports") 
+            ? "bg-primary/10 text-primary shadow-sm" 
+            : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
+          isCollapsed && "justify-center"
+        )}>
+          <FileText className="w-5 h-5" />
+          {!isCollapsed && "Relatórios"}
+
+          {isCollapsed && (
+            <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+              Relatórios
             </span>
           )}
-        </div>
-      </SidebarHeader>
+        </Link>
 
-      <SidebarContent className="px-2">
-        <SidebarMenu>
-          {filteredItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                isActive={location === item.href}
-                tooltip={item.title}
-                className={cn(
-                  "hover-elevate active-elevate-2",
-                  location === item.href && "bg-primary/10 text-primary"
-                )}
-              >
-                <Link href={item.href} className="flex items-center gap-3">
-                  <item.icon className="h-5 w-5" />
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarContent>
+        <Link href="/alerts" className={cn(
+          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
+          isActive("/alerts") 
+            ? "bg-primary/10 text-primary shadow-sm" 
+            : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
+          isCollapsed && "justify-center"
+        )}>
+          <Bell className="w-5 h-5" />
+          {!isCollapsed && "Alertas"}
 
-      <SidebarFooter className="p-4 border-t border-slate-100">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="w-full justify-start gap-3 px-2 h-12 hover-elevate">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.avatar || ""} />
-                <AvatarFallback className="bg-primary/10 text-primary">
-                  {user?.name?.[0] || "U"}
-                </AvatarFallback>
-              </Avatar>
-              {!isCollapsed && (
-                <div className="flex flex-col items-start text-left overflow-hidden">
-                  <span className="text-sm font-medium text-slate-900 truncate w-full">
-                    {user?.name}
-                  </span>
-                  <span className="text-xs text-slate-500 capitalize">
-                    {user?.role === 'admin' ? 'Administrador' : 'Cliente'}
-                  </span>
-                </div>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem
-              className="text-destructive focus:text-destructive cursor-pointer"
+          {isCollapsed && (
+            <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+              Alertas
+            </span>
+          )}
+        </Link>
+
+        {user.role === 'admin' && (
+          <Link href="/settings" className={cn(
+            "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
+            isActive("/settings") 
+              ? "bg-primary/10 text-primary shadow-sm" 
+              : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
+            isCollapsed && "justify-center"
+          )}>
+            <Settings className="w-5 h-5" />
+            {!isCollapsed && "Configurações"}
+
+            {isCollapsed && (
+              <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                Configurações
+              </span>
+            )}
+          </Link>
+        )}
+      </nav>
+
+      {/* User Profile Footer */}
+      <div className="p-4 border-t border-border/50 bg-slate-50/50">
+        {isCollapsed ? (
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold shadow-md relative group">
+              {user.username.charAt(0).toUpperCase()}
+              <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                {user.name}
+              </span>
+            </div>
+
+            <button 
               onClick={() => logout()}
+              className="w-10 h-10 flex items-center justify-center rounded-lg border border-border bg-white hover:bg-red-50 hover:text-destructive hover:border-red-200 transition-colors shadow-sm relative group"
             >
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Sair</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarFooter>
-    </SidebarUI>
+              <LogOut className="w-4 h-4" />
+              <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                Sair
+              </span>
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 mb-3 px-2">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold shadow-md">
+                {user.username.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-foreground truncate">{user.name}</p>
+                <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => logout()}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border bg-white hover:bg-red-50 hover:text-destructive hover:border-red-200 transition-colors text-sm font-medium shadow-sm"
+            >
+              <LogOut className="w-4 h-4" />
+              Sair
+            </button>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
