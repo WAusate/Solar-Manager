@@ -26,7 +26,7 @@ export default function Sidebar() {
 
   return (
     <div className={cn(
-      "h-screen bg-white border-r border-border flex flex-col shadow-xl shadow-slate-200/50 transition-all duration-300 relative",
+      "h-screen bg-white border-r border-border flex flex-col shadow-xl shadow-slate-200/50 transition-all duration-300 relative shrink-0",
       isCollapsed ? "w-20" : "w-64"
     )}>
       {/* Logo Area */}
@@ -60,7 +60,7 @@ export default function Sidebar() {
       </button>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto overflow-x-hidden">
         {!isCollapsed && (
           <div className="px-4 mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
             Menu Principal
@@ -75,8 +75,8 @@ export default function Sidebar() {
               : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
             isCollapsed && "justify-center"
           )}>
-            <LayoutDashboard className="w-5 h-5" />
-            {!isCollapsed && "Dashboard"}
+            <LayoutDashboard className="w-5 h-5 shrink-0" />
+            {!isCollapsed && <span className="truncate">Dashboard</span>}
 
             {isCollapsed && (
               <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
@@ -94,8 +94,8 @@ export default function Sidebar() {
               : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
             isCollapsed && "justify-center"
           )}>
-            <ShieldCheck className="w-5 h-5" />
-            {!isCollapsed && "Painel Admin"}
+            <ShieldCheck className="w-5 h-5 shrink-0" />
+            {!isCollapsed && <span className="truncate">Painel Admin</span>}
 
             {isCollapsed && (
               <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
@@ -112,8 +112,8 @@ export default function Sidebar() {
             : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
           isCollapsed && "justify-center"
         )}>
-          <FileText className="w-5 h-5" />
-          {!isCollapsed && "Relatórios"}
+          <FileText className="w-5 h-5 shrink-0" />
+          {!isCollapsed && <span className="truncate">Relatórios</span>}
 
           {isCollapsed && (
             <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
@@ -129,8 +129,8 @@ export default function Sidebar() {
             : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
           isCollapsed && "justify-center"
         )}>
-          <Bell className="w-5 h-5" />
-          {!isCollapsed && "Alertas"}
+          <Bell className="w-5 h-5 shrink-0" />
+          {!isCollapsed && <span className="truncate">Alertas</span>}
 
           {isCollapsed && (
             <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
@@ -147,8 +147,8 @@ export default function Sidebar() {
               : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
             isCollapsed && "justify-center"
           )}>
-            <Settings className="w-5 h-5" />
-            {!isCollapsed && "Configurações"}
+            <Settings className="w-5 h-5 shrink-0" />
+            {!isCollapsed && <span className="truncate">Configurações</span>}
 
             {isCollapsed && (
               <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
@@ -163,7 +163,7 @@ export default function Sidebar() {
       <div className="p-4 border-t border-border/50 bg-slate-50/50">
         {isCollapsed ? (
           <div className="flex flex-col items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold shadow-md relative group">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold shadow-md relative group shrink-0">
               {user.username.charAt(0).toUpperCase()}
               <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
                 {user.name}
@@ -172,7 +172,7 @@ export default function Sidebar() {
 
             <button 
               onClick={() => logout()}
-              className="w-10 h-10 flex items-center justify-center rounded-lg border border-border bg-white hover:bg-red-50 hover:text-destructive hover:border-red-200 transition-colors shadow-sm relative group"
+              className="w-10 h-10 flex items-center justify-center rounded-lg border border-border bg-white hover:bg-red-50 hover:text-destructive hover:border-red-200 transition-colors shadow-sm relative group shrink-0"
             >
               <LogOut className="w-4 h-4" />
               <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
@@ -183,7 +183,7 @@ export default function Sidebar() {
         ) : (
           <>
             <div className="flex items-center gap-3 mb-3 px-2">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold shadow-md">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold shadow-md shrink-0">
                 {user.username.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">

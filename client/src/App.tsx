@@ -12,7 +12,6 @@ import Alerts from "@/pages/Alerts";
 import Reports from "@/pages/Reports";
 import Settings from "@/pages/Settings";
 import NotFound from "@/pages/not-found";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import Sidebar from "@/components/Sidebar";
 
 // Protected Route Component
@@ -42,14 +41,12 @@ function ProtectedRoute({
   }
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        <Sidebar />
-        <main className="flex-1 overflow-auto">
-          <Component />
-        </main>
-      </div>
-    </SidebarProvider>
+    <div className="flex bg-slate-50 min-h-screen w-full overflow-x-hidden">
+      <Sidebar />
+      <main className="flex-1 min-h-screen overflow-y-auto transition-all duration-300">
+        <Component />
+      </main>
+    </div>
   );
 }
 
