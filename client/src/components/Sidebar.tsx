@@ -47,7 +47,10 @@ export default function Sidebar() {
       {/* Toggle Button - Seta na borda */}
       <button
         onClick={toggleSidebar}
-        className="absolute -right-3 top-24 w-6 h-12 bg-white border border-border rounded-r-lg flex items-center justify-center hover:bg-slate-50 transition-colors shadow-sm group z-50"
+        className={cn(
+          "absolute top-24 w-6 h-12 bg-white border border-border rounded-r-lg flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm group z-50",
+          isCollapsed ? "left-[calc(var(--sidebar-width-icon)-1px)]" : "left-[calc(var(--sidebar-width)-1px)]"
+        )}
         aria-label={isCollapsed ? "Expandir menu" : "Recolher menu"}
       >
         {isCollapsed ? (
