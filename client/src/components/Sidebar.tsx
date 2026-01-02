@@ -7,6 +7,7 @@ import {
   Bell, 
   Settings, 
   ShieldCheck, 
+  Users,
   LogOut,
   ChevronLeft,
   ChevronRight
@@ -88,21 +89,39 @@ export default function Sidebar() {
         )}
 
         {user.role === 'admin' && (
-          <Link href="/admin-panel" className={cn(
-            "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
-            isActive("/admin-panel") 
-              ? "bg-primary/10 text-primary shadow-sm" 
-              : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
-            isCollapsed && "justify-center px-0"
-          )}>
-            <ShieldCheck className="w-5 h-5 shrink-0" />
-            {!isCollapsed && <span className="truncate opacity-100 transition-opacity duration-200">Painel Admin</span>}
-            {isCollapsed && (
-              <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-[60]">
-                Painel Admin
-              </span>
-            )}
-          </Link>
+          <>
+            <Link href="/admin-panel" className={cn(
+              "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
+              isActive("/admin-panel") 
+                ? "bg-primary/10 text-primary shadow-sm" 
+                : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
+              isCollapsed && "justify-center px-0"
+            )}>
+              <ShieldCheck className="w-5 h-5 shrink-0" />
+              {!isCollapsed && <span className="truncate opacity-100 transition-opacity duration-200">Painel Admin</span>}
+              {isCollapsed && (
+                <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-[60]">
+                  Painel Admin
+                </span>
+              )}
+            </Link>
+
+            <Link href="/clients" className={cn(
+              "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
+              isActive("/clients") 
+                ? "bg-primary/10 text-primary shadow-sm" 
+                : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
+              isCollapsed && "justify-center px-0"
+            )}>
+              <Users className="w-5 h-5 shrink-0" />
+              {!isCollapsed && <span className="truncate opacity-100 transition-opacity duration-200">Clientes</span>}
+              {isCollapsed && (
+                <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-[60]">
+                  Clientes
+                </span>
+              )}
+            </Link>
+          </>
         )}
 
         <Link href="/reports" className={cn(

@@ -10,6 +10,7 @@ import Dashboard from "@/pages/Dashboard";
 import AdminPanel from "@/pages/AdminPanel";
 import Alerts from "@/pages/Alerts";
 import Reports from "@/pages/Reports";
+import Clients from "@/pages/Clients";
 import Settings from "@/pages/Settings";
 import NotFound from "@/pages/not-found";
 import Sidebar from "@/components/Sidebar";
@@ -73,6 +74,10 @@ function Router() {
 
       <Route path="/reports">
         <ProtectedRoute component={Reports} />
+      </Route>
+
+      <Route path="/clients">
+        <ProtectedRoute component={Clients} allowedRoles={['admin']} />
       </Route>
 
       <Route path="/settings">

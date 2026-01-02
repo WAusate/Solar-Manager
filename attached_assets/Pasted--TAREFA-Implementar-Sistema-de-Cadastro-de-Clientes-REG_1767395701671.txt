@@ -1,0 +1,117 @@
+# 🎯 TAREFA: Implementar Sistema de Cadastro de Clientes
+
+## ⚠️ REGRAS CRÍTICAS
+
+1. **NÃO ALTERE** nenhuma página ou funcionalidade existente
+2. **APENAS CRIE** o sistema de cadastro de clientes
+3. **MANTENHA** o padrão visual e de código atual do sistema
+4. **SIGA** a estrutura de pastas e arquivos já existente
+
+---
+
+## 📋 O QUE PRECISA SER IMPLEMENTADO
+
+### 1. Nova Página "Clientes" (Apenas para Admin)
+
+**Funcionalidades:**
+- Lista de todos os clientes cadastrados em tabela
+- Botão para cadastrar novo cliente
+- Formulário de cadastro (pode ser modal ou página)
+- Opção de editar cliente existente
+- Opção de excluir cliente (com confirmação)
+- Busca/filtro de clientes
+
+**Campos do Cliente:**
+- Nome completo (obrigatório)
+- Email (obrigatório, único)
+- Senha inicial (obrigatório no cadastro)
+- CPF/CNPJ (obrigatório)
+- Telefone
+- Endereço da usina
+- Capacidade da usina (kWp)
+- Status (ativo/inativo)
+
+---
+
+### 2. Adicionar no Menu Lateral (Sidebar)
+
+**Para o Admin:**
+- Nova opção "Clientes" com ícone de usuários
+- Posição: Entre "Painel Admin" e "Relatórios"
+- Deve aparecer apenas para role: 'admin'
+
+**Para o Cliente:**
+- NÃO deve aparecer esta opção
+
+---
+
+### 3. Backend (API)
+
+Criar rotas para:
+- **GET /api/clients** - Listar todos os clientes (apenas admin)
+- **POST /api/clients** - Cadastrar novo cliente (apenas admin)
+- **PUT /api/clients/:id** - Editar cliente (apenas admin)
+- **DELETE /api/clients/:id** - Excluir cliente (apenas admin)
+
+**Validações necessárias:**
+- Email não pode ser duplicado
+- Campos obrigatórios devem ser validados
+- Senha deve ser hashada antes de salvar
+- Apenas admin pode acessar essas rotas
+
+---
+
+### 4. Rota de Navegação
+
+Adicionar rota `/clients` que:
+- Só pode ser acessada por admin
+- Redireciona cliente se tentar acessar
+- Renderiza a página de Clientes
+
+---
+
+## 🎨 PADRÃO VISUAL
+
+- Seguir o mesmo design do **Painel Admin** (AdminPanel.tsx)
+- Usar mesmos componentes, cores e estilos
+- Tabelas, cards e botões no mesmo padrão
+- Ícones do lucide-react
+- Animações e transições suaves
+
+---
+
+## ✅ VALIDAÇÃO FINAL
+
+Após implementar, o sistema deve:
+
+**Admin pode:**
+- Ver opção "Clientes" no menu
+- Acessar página de clientes
+- Ver lista de todos os clientes
+- Cadastrar novo cliente
+- Editar cliente existente
+- Excluir cliente (com confirmação)
+
+**Cliente não pode:**
+- Ver opção "Clientes" no menu
+- Acessar `/clients` (deve ser redirecionado)
+
+---
+
+## 🚫 NÃO ALTERE
+
+- Dashboard
+- Alertas
+- Relatórios
+- Settings
+- Login
+- Sidebar (apenas adicione 1 item de menu)
+- Autenticação existente
+
+---
+
+## 🎯 OBJETIVO
+
+Criar um CRUD completo de clientes para que o administrador possa gerenciar os usuários do tipo "client" do sistema.
+
+Implemente esta funcionalidade de forma limpa, seguindo os padrões já existentes no código.

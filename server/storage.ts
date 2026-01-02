@@ -19,6 +19,11 @@ export interface IStorage {
 
   getReports(userId?: number): Promise<Report[]>;
   
+  // Clients CRUD
+  getClients(): Promise<User[]>;
+  updateClient(id: number, client: Partial<InsertUser>): Promise<User | undefined>;
+  deleteClient(id: number): Promise<boolean>;
+
   sessionStore: session.Store;
 }
 
@@ -78,6 +83,23 @@ export class DatabaseStorage implements IStorage {
       return db.select().from(reports).where(eq(reports.userId, userId)).orderBy(desc(reports.date));
     }
     return db.select().from(reports).orderBy(desc(reports.date));
+  }
+
+  async getClients(): Promise<User[]> {
+    return db.select().from(users).where(eq(users.role, 'client'));
+  }
+
+  async updateClient(id: number, client: Partial<InsertUser>): Promise<User | undefined> {
+    const [updated] = await db.update(users)
+      .set(client)
+      .where(eq(users.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteClient(id: number): Promise<boolean> {
+    const [deleted] = await db.delete(users).where(eq(users.id, id)).returning();
+    return !!deleted;
   }
 }
 

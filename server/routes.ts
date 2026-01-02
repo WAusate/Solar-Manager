@@ -69,6 +69,55 @@ export async function registerRoutes(
     });
   });
 
+  // 4. Clients CRUD (Admin only)
+  app.get("/api/clients", async (req, res) => {
+    if (!req.isAuthenticated() || (req.user as any).role !== 'admin') {
+      return res.sendStatus(403);
+    }
+    const clients = await storage.getClients();
+    res.json(clients);
+  });
+
+  app.post("/api/clients", async (req, res) => {
+    if (!req.isAuthenticated() || (req.user as any).role !== 'admin') {
+      return res.sendStatus(403);
+    }
+    try {
+      const existing = await storage.getUserByUsername(req.body.username);
+      if (existing) {
+        return res.status(400).json({ message: "Email já cadastrado" });
+      }
+      const client = await storage.createUser({
+        ...req.body,
+        role: 'client',
+        avatar: req.body.avatar || `https://avatar.iran.liara.run/username?username=${encodeURIComponent(req.body.name)}`
+      });
+      res.status(201).json(client);
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
+  });
+
+  app.put("/api/clients/:id", async (req, res) => {
+    if (!req.isAuthenticated() || (req.user as any).role !== 'admin') {
+      return res.sendStatus(403);
+    }
+    const id = parseInt(req.params.id);
+    const updated = await storage.updateClient(id, req.body);
+    if (!updated) return res.sendStatus(404);
+    res.json(updated);
+  });
+
+  app.delete("/api/clients/:id", async (req, res) => {
+    if (!req.isAuthenticated() || (req.user as any).role !== 'admin') {
+      return res.sendStatus(403);
+    }
+    const id = parseInt(req.params.id);
+    const success = await storage.deleteClient(id);
+    if (!success) return res.sendStatus(404);
+    res.sendStatus(204);
+  });
+
   // Seed Data (Check and create if missing)
   await seedDatabase();
 

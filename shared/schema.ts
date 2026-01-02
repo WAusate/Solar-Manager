@@ -11,6 +11,11 @@ export const users = pgTable("users", {
   role: text("role", { enum: ["admin", "client"] }).notNull().default("client"),
   name: text("name").notNull(),
   avatar: text("avatar"),
+  cpfCnpj: text("cpf_cnpj"),
+  phone: text("phone"),
+  plantAddress: text("plant_address"),
+  plantCapacity: text("plant_capacity"), // kWp
+  status: text("status", { enum: ["active", "inactive"] }).notNull().default("active"),
 });
 
 export const alerts = pgTable("alerts", {
