@@ -1,0 +1,120 @@
+# Prompt para Correções do Sistema Gestão Solar
+
+Olá! Preciso que você faça as seguintes correções no sistema baseado no PRD e feedback do cliente:
+
+## 🎯 Correções Prioritárias
+
+### 1. SEPARAR Menus por Perfil de Usuário
+
+**MENU DO CLIENTE FINAL (role: 'client'):**
+```
+📊 Dashboard
+📄 Relatórios
+🔔 Alertas
+```
+- **NÃO mostrar** "Painel Admin"
+- **NÃO mostrar** "Configurações"
+- Adicionar avatar/nome do usuário no canto com dropdown contendo apenas "Sair"
+
+**MENU DO ADMIN/OPERADOR (role: 'admin'):**
+```
+🏢 Painel Admin
+📄 Relatórios
+🔔 Alertas
+⚙️ Configurações
+```
+- Adicionar avatar/nome do usuário no canto com dropdown contendo apenas "Sair"
+
+### 2. IMPLEMENTAR Renderização Condicional de Menus
+- Adicionar campo `role` no sistema de autenticação (valores: 'client' ou 'admin')
+- Renderizar menu apropriado baseado no role do usuário logado
+- Exemplo de implementação:
+```typescript
+// Componente de Menu/Sidebar
+{user.role === 'client' && (
+  <>
+    <MenuItem to="/dashboard">Dashboard</MenuItem>
+    <MenuItem to="/relatorios">Relatórios</MenuItem>
+    <MenuItem to="/alertas">Alertas</MenuItem>
+  </>
+)}
+
+{user.role === 'admin' && (
+  <>
+    <MenuItem to="/painel-admin">Painel Admin</MenuItem>
+    <MenuItem to="/relatorios">Relatórios</MenuItem>
+    <MenuItem to="/alertas">Alertas</MenuItem>
+    <MenuItem to="/configuracoes">Configurações</MenuItem>
+  </>
+)}
+```
+
+### 3. DIFERENCIAR Página de Alertas por Perfil
+
+**Alertas do Cliente:**
+- Mostrar APENAS alertas da usina do usuário logado
+- NÃO permitir ações de "marcar como resolvido"
+- Apenas visualização de histórico
+- Manter o layout atual que já existe
+
+**Alertas do Admin:**
+- Mostrar alertas de TODAS as usinas
+- Incluir informação de qual cliente/usina em cada alerta
+- Adicionar filtros por cliente/usina/status
+- ADICIONAR ação "Marcar como Resolvido" em cada alerta (botão ou ícone)
+- Pode ser um botão ao lado de cada alerta ou ao clicar no alerta
+
+Exemplo de como pode ficar a ação de resolver:
+```
+[Alerta] Baixa eficiência detectada no Inversor 01 - João Silva
+                                              [Marcar como Resolvido]
+```
+
+### 4. PROTEGER Rotas por Perfil
+
+Implementar proteção para que:
+- Cliente NÃO possa acessar `/painel-admin` ou `/configuracoes` mesmo digitando na URL
+- Admin possa acessar todas as rotas
+- Redirecionar automaticamente se tentar acessar rota não autorizada
+
+---
+
+## 📋 Checklist de Validação
+
+Após as correções, o sistema deve:
+- [ ] Cliente NÃO vê "Painel Admin" nem "Configurações" no menu
+- [ ] Admin vê todas as opções do menu (incluindo Configurações)
+- [ ] Renderização condicional funciona corretamente baseada no role
+- [ ] Alertas do cliente mostram apenas alertas da própria usina
+- [ ] Alertas do admin mostram todas as usinas com ação de resolver
+- [ ] Proteção de rotas impede cliente de acessar áreas admin
+- [ ] Avatar/dropdown com "Sair" funciona em ambos perfis
+
+---
+
+## 🔧 Observações Técnicas
+
+- Mantenha o design atual (está muito bom!)
+- Use renderização condicional com base em `user.role`
+- Adicione proteção de rotas (route guards)
+- Para teste, crie dois usuários mock:
+  - `cliente@teste.com` (role: 'client') - deve ver apenas Dashboard, Relatórios, Alertas
+  - `admin@teste.com` (role: 'admin') - deve ver Painel Admin, Relatórios, Alertas, Configurações
+
+---
+
+## ⚠️ NÃO Altere
+
+- Layout e design visual atual
+- Funcionalidade do Painel Admin (Central de Monitoramento)
+- Sistema de relatórios
+- Dashboard do cliente
+- **NÃO corrija o erro do botão Configurações agora** (será tratado depois)
+
+---
+
+## 🎯 Foco Principal
+
+O objetivo é garantir que **cliente veja apenas o que precisa** (Dashboard, Relatórios, Alertas) e **admin tenha acesso completo** ao sistema, com menus e funcionalidades apropriadas para cada perfil.
+
+Implemente essas correções mantendo a qualidade visual e funcional que já existe.
