@@ -8,8 +8,8 @@ import {
   Settings, 
   ShieldCheck, 
   LogOut,
-  Menu,
-  X
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { useState } from "react";
 import logo from "@assets/grok-image-deixe_apenas_no_estilo_com_fundo_branco.-9102eb94-c_1767312477482.png";
@@ -30,7 +30,7 @@ export default function Sidebar() {
       isCollapsed ? "w-20" : "w-64"
     )}>
       {/* Logo Area */}
-      <div className="p-6 flex justify-center items-center border-b border-border/50 relative">
+      <div className="p-6 flex justify-center items-center border-b border-border/50">
         {isCollapsed ? (
           <img 
             src={logoIcon} 
@@ -44,16 +44,20 @@ export default function Sidebar() {
             className="h-20 w-auto object-contain drop-shadow-sm" 
           />
         )}
-
-        {/* Toggle Button */}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center shadow-md hover:bg-primary/90 transition-colors"
-          aria-label={isCollapsed ? "Expandir menu" : "Recolher menu"}
-        >
-          {isCollapsed ? <Menu className="w-3 h-3" /> : <X className="w-3 h-3" />}
-        </button>
       </div>
+
+      {/* Toggle Button - Seta na borda */}
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute -right-3 top-24 w-6 h-12 bg-white border border-border rounded-r-lg flex items-center justify-center hover:bg-slate-50 transition-colors shadow-sm group"
+        aria-label={isCollapsed ? "Expandir menu" : "Recolher menu"}
+      >
+        {isCollapsed ? (
+          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+        ) : (
+          <ChevronLeft className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+        )}
+      </button>
 
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6 space-y-2">
