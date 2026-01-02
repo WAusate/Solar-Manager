@@ -11,26 +11,24 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
-import { useState } from "react";
 import logo from "@assets/grok-image-deixe_apenas_no_estilo_com_fundo_branco.-9102eb94-c_1767312477482.png";
 import logoIcon from "@assets/logo-icon.png";
+import { Sidebar as SidebarBase, SidebarContent, SidebarHeader, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 
 export default function Sidebar() {
   const [location] = useLocation();
   const { user, logout } = useAuth();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { state, toggleSidebar } = useSidebar();
+  const isCollapsed = state === "collapsed";
 
   const isActive = (path: string) => location === path;
 
   if (!user) return null;
 
   return (
-    <div className={cn(
-      "h-screen bg-white border-r border-border flex flex-col fixed left-0 top-0 z-50 shadow-xl shadow-slate-200/50 transition-all duration-300",
-      isCollapsed ? "w-20" : "w-64"
-    )}>
+    <SidebarBase collapsible="icon" className="border-r border-border shadow-xl shadow-slate-200/50">
       {/* Logo Area */}
-      <div className="p-6 flex justify-center items-center border-b border-border/50">
+      <SidebarHeader className="p-6 flex justify-center items-center border-b border-border/50">
         {isCollapsed ? (
           <img 
             src={logoIcon} 
@@ -44,12 +42,12 @@ export default function Sidebar() {
             className="h-20 w-auto object-contain drop-shadow-sm" 
           />
         )}
-      </div>
+      </SidebarHeader>
 
       {/* Toggle Button - Seta na borda */}
       <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-24 w-6 h-12 bg-white border border-border rounded-r-lg flex items-center justify-center hover:bg-slate-50 transition-colors shadow-sm group"
+        onClick={toggleSidebar}
+        className="absolute -right-3 top-24 w-6 h-12 bg-white border border-border rounded-r-lg flex items-center justify-center hover:bg-slate-50 transition-colors shadow-sm group z-50"
         aria-label={isCollapsed ? "Expandir menu" : "Recolher menu"}
       >
         {isCollapsed ? (
@@ -60,114 +58,104 @@ export default function Sidebar() {
       </button>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-2">
-        {!isCollapsed && (
-          <div className="px-4 mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
-            Menu Principal
-          </div>
-        )}
-
-        {user.role === 'client' && (
-          <Link href="/dashboard" className={cn(
-            "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
-            isActive("/dashboard") 
-              ? "bg-primary/10 text-primary shadow-sm" 
-              : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
-            isCollapsed && "justify-center"
-          )}>
-            <LayoutDashboard className="w-5 h-5" />
-            {!isCollapsed && "Dashboard"}
-
-            {isCollapsed && (
-              <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
-                Dashboard
-              </span>
-            )}
-          </Link>
-        )}
-
-        {user.role === 'admin' && (
-          <Link href="/admin-panel" className={cn(
-            "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
-            isActive("/admin-panel") 
-              ? "bg-primary/10 text-primary shadow-sm" 
-              : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
-            isCollapsed && "justify-center"
-          )}>
-            <ShieldCheck className="w-5 h-5" />
-            {!isCollapsed && "Painel Admin"}
-
-            {isCollapsed && (
-              <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
-                Painel Admin
-              </span>
-            )}
-          </Link>
-        )}
-
-        <Link href="/reports" className={cn(
-          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
-          isActive("/reports") 
-            ? "bg-primary/10 text-primary shadow-sm" 
-            : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
-          isCollapsed && "justify-center"
-        )}>
-          <FileText className="w-5 h-5" />
-          {!isCollapsed && "Relatórios"}
-
-          {isCollapsed && (
-            <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
-              Relatórios
-            </span>
+      <SidebarContent className="px-4 py-6">
+        <SidebarGroup>
+          {!isCollapsed && (
+            <div className="px-4 mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+              Menu Principal
+            </div>
           )}
-        </Link>
-
-        <Link href="/alerts" className={cn(
-          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
-          isActive("/alerts") 
-            ? "bg-primary/10 text-primary shadow-sm" 
-            : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
-          isCollapsed && "justify-center"
-        )}>
-          <Bell className="w-5 h-5" />
-          {!isCollapsed && "Alertas"}
-
-          {isCollapsed && (
-            <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
-              Alertas
-            </span>
-          )}
-        </Link>
-
-        {user.role === 'admin' && (
-          <Link href="/settings" className={cn(
-            "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
-            isActive("/settings") 
-              ? "bg-primary/10 text-primary shadow-sm" 
-              : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
-            isCollapsed && "justify-center"
-          )}>
-            <Settings className="w-5 h-5" />
-            {!isCollapsed && "Configurações"}
-
-            {isCollapsed && (
-              <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
-                Configurações
-              </span>
+          <SidebarMenu className="space-y-2">
+            {user.role === 'client' && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isActive("/dashboard")} tooltip="Dashboard">
+                  <Link href="/dashboard" className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
+                    isActive("/dashboard") 
+                      ? "bg-primary/10 text-primary shadow-sm" 
+                      : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
+                    isCollapsed && "justify-center"
+                  )}>
+                    <LayoutDashboard className="w-5 h-5" />
+                    {!isCollapsed && "Dashboard"}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             )}
-          </Link>
-        )}
-      </nav>
+
+            {user.role === 'admin' && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isActive("/admin-panel")} tooltip="Painel Admin">
+                  <Link href="/admin-panel" className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
+                    isActive("/admin-panel") 
+                      ? "bg-primary/10 text-primary shadow-sm" 
+                      : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
+                    isCollapsed && "justify-center"
+                  )}>
+                    <ShieldCheck className="w-5 h-5" />
+                    {!isCollapsed && "Painel Admin"}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={isActive("/reports")} tooltip="Relatórios">
+                <Link href="/reports" className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
+                  isActive("/reports") 
+                    ? "bg-primary/10 text-primary shadow-sm" 
+                    : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
+                  isCollapsed && "justify-center"
+                )}>
+                  <FileText className="w-5 h-5" />
+                  {!isCollapsed && "Relatórios"}
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={isActive("/alerts")} tooltip="Alertas">
+                <Link href="/alerts" className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
+                  isActive("/alerts") 
+                    ? "bg-primary/10 text-primary shadow-sm" 
+                    : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
+                  isCollapsed && "justify-center"
+                )}>
+                  <Bell className="w-5 h-5" />
+                  {!isCollapsed && "Alertas"}
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            {user.role === 'admin' && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isActive("/settings")} tooltip="Configurações">
+                  <Link href="/settings" className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium relative group",
+                    isActive("/settings") 
+                      ? "bg-primary/10 text-primary shadow-sm" 
+                      : "text-muted-foreground hover:bg-slate-50 hover:text-foreground",
+                    isCollapsed && "justify-center"
+                  )}>
+                    <Settings className="w-5 h-5" />
+                    {!isCollapsed && "Configurações"}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
 
       {/* User Profile Footer */}
-      <div className="p-4 border-t border-border/50 bg-slate-50/50">
+      <SidebarFooter className="p-4 border-t border-border/50 bg-slate-50/50">
         {isCollapsed ? (
           <div className="flex flex-col items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold shadow-md relative group">
               {user.username.charAt(0).toUpperCase()}
-              <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
-                {user.name}
-              </span>
             </div>
 
             <button 
@@ -175,9 +163,6 @@ export default function Sidebar() {
               className="w-10 h-10 flex items-center justify-center rounded-lg border border-border bg-white hover:bg-red-50 hover:text-destructive hover:border-red-200 transition-colors shadow-sm relative group"
             >
               <LogOut className="w-4 h-4" />
-              <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
-                Sair
-              </span>
             </button>
           </div>
         ) : (
@@ -200,7 +185,7 @@ export default function Sidebar() {
             </button>
           </>
         )}
-      </div>
-    </div>
+      </SidebarFooter>
+    </SidebarBase>
   );
 }
