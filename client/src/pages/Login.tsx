@@ -38,7 +38,7 @@ export default function Login() {
 
       <Card className="w-full max-w-md shadow-2xl border-white/50 backdrop-blur-sm bg-white/90">
         <CardHeader className="space-y-4 flex flex-col items-center text-center pb-2">
-          <div className="w-20 h-20 mb-2 relative">
+          <div className="w-40 h-40 mb-2 relative">
              <img src={logo} alt="Logo" className="w-full h-full object-contain" />
           </div>
           <div className="space-y-2">

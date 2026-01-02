@@ -12,8 +12,8 @@ import {
   ChevronRight
 } from "lucide-react";
 import { useState } from "react";
-import logo from "@assets/grok-image-deixe_apenas_no_estilo_com_fundo_branco.-9102eb94-c_1767312477482.png";
-import logoIcon from "@assets/logo-icon.png";
+import logo from "@assets/grok-image-deixe_apenas_no_estilo_com_fundo_branco.-9102eb94-c_1767312477482.svg";
+import logoIcon from "@assets/logo-icon.svg";
 
 export default function Sidebar() {
   const [location] = useLocation();
@@ -42,7 +42,7 @@ export default function Sidebar() {
             <img 
               src={logo} 
               alt="Gestão Solar" 
-              className="h-20 w-auto object-contain drop-shadow-sm transition-opacity duration-300" 
+              className="h-40 w-auto object-contain drop-shadow-sm transition-opacity duration-300" 
             />
           )}
         </div>
