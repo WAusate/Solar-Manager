@@ -1,38 +1,84 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
+import { db } from "./db";
+import { users, alerts, reports, type User, type InsertUser, type Alert, type InsertAlert, type Report } from "@shared/schema";
+import { eq, desc } from "drizzle-orm";
+import session from "express-session";
+import connectPg from "connect-pg-simple";
+import { pool } from "./db";
 
-// modify the interface with any CRUD methods
-// you might need
+const PostgresSessionStore = connectPg(session);
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
+  getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+
+  getAlerts(userId?: number): Promise<Alert[]>; // If userId is provided, filter by it (for clients)
+  getAllAlerts(): Promise<Alert[]>; // For admins
+  createAlert(alert: InsertAlert): Promise<Alert>;
+  resolveAlert(id: number): Promise<Alert | undefined>;
+
+  getReports(userId?: number): Promise<Report[]>;
+  
+  sessionStore: session.Store;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
+export class DatabaseStorage implements IStorage {
+  sessionStore: session.Store;
 
   constructor() {
-    this.users = new Map();
+    this.sessionStore = new PostgresSessionStore({
+      pool,
+      createTableIfMissing: true,
+    });
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async createUser(user: InsertUser): Promise<User> {
+    const [newUser] = await db.insert(users).values(user).returning();
+    return newUser;
+  }
+
+  async getAlerts(userId?: number): Promise<Alert[]> {
+    if (userId) {
+      return db.select().from(alerts).where(eq(alerts.userId, userId)).orderBy(desc(alerts.createdAt));
+    }
+    // If no userId, return all? Or maybe just return empty if stricter. 
+    // But for this specific method signature, let's assume it's for specific user fetching.
+    return db.select().from(alerts).orderBy(desc(alerts.createdAt));
+  }
+
+  async getAllAlerts(): Promise<Alert[]> {
+    return db.select().from(alerts).orderBy(desc(alerts.createdAt));
+  }
+
+  async createAlert(alert: InsertAlert): Promise<Alert> {
+    const [newAlert] = await db.insert(alerts).values(alert).returning();
+    return newAlert;
+  }
+
+  async resolveAlert(id: number): Promise<Alert | undefined> {
+    const [updated] = await db.update(alerts)
+      .set({ status: 'resolved' })
+      .where(eq(alerts.id, id))
+      .returning();
+    return updated;
+  }
+
+  async getReports(userId?: number): Promise<Report[]> {
+    if (userId) {
+      return db.select().from(reports).where(eq(reports.userId, userId)).orderBy(desc(reports.date));
+    }
+    return db.select().from(reports).orderBy(desc(reports.date));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
