@@ -7,8 +7,7 @@ import {
   Bell, 
   Settings, 
   ShieldCheck, 
-  LogOut,
-  Sun
+  LogOut
 } from "lucide-react";
 import logo from "@assets/grok-image-deixe_apenas_no_estilo_com_fundo_branco.-9102eb94-c_1767312477482.png";
 
@@ -23,19 +22,12 @@ export default function Sidebar() {
   return (
     <div className="h-screen w-64 bg-white border-r border-border flex flex-col fixed left-0 top-0 z-50 shadow-xl shadow-slate-200/50">
       {/* Logo Area */}
-      <div className="p-6 flex flex-col items-center border-b border-border/50">
-        <div className="h-16 w-16 mb-2 relative">
-           {/* Solar Company Logo */}
-           <img 
-            src={logo} 
-            alt="Solar Manager Logo" 
-            className="w-full h-full object-contain drop-shadow-sm" 
-          />
-        </div>
-        <h1 className="font-display font-bold text-xl tracking-tight text-foreground">
-          Solar<span className="text-primary">Manager</span>
-        </h1>
-        <p className="text-xs text-muted-foreground mt-1">Energy Intelligence</p>
+      <div className="p-6 flex justify-center border-b border-border/50">
+        <img 
+          src={logo} 
+          alt="Gestão Solar" 
+          className="h-20 w-auto object-contain drop-shadow-sm" 
+        />
       </div>
 
       {/* Navigation */}
