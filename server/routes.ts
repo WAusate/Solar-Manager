@@ -130,7 +130,15 @@ export async function registerRoutes(
     }
     
     const reports = await storage.getBillingReports(userId);
-    res.json(reports);
+    
+    // Enrich reports with units and history if requested
+    const enrichedReports = await Promise.all(reports.map(async (report) => {
+      const units = await storage.getBillingUnits(report.id);
+      const history = await storage.getBillingHistory(report.id);
+      return { ...report, units, history };
+    }));
+    
+    res.json(enrichedReports);
   });
 
   // Seed Data (Check and create if missing)
@@ -184,19 +192,48 @@ async function seedDatabase() {
     // Seed Billing Reports for client
     const existingBilling = await storage.getBillingReports(newClient.id);
     if (existingBilling.length === 0) {
-      const months = [
-        "Dezembro/2024", "Janeiro/2025", "Fevereiro/2025", "Março/2025",
-        "Abril/2025", "Maio/2025", "Junho/2025", "Julho/2025",
-        "Agosto/2025", "Setembro/2025", "Outubro/2025", "Novembro/2025", "Dezembro/2025"
+      // Create December 2025 Report (Orlando Andre Avelino)
+      const decReport = await storage.createBillingReport({
+        userId: newClient.id,
+        mes: 12,
+        ano: 2025,
+        energiaInjetada: "641",
+        energiaConsumida: "591",
+        saldoCredito: "1526.51",
+        monthYear: "Dezembro/2025",
+        pdfUrl: "/reports/dec-2025.pdf"
+      });
+
+      // Add units for Dec 2025
+      await storage.createBillingUnit({
+        billingReportId: decReport.id,
+        codigoCliente: "7200000001",
+        saldoCredito: "763.25",
+        percentualCompensacao: 100
+      });
+      await storage.createBillingUnit({
+        billingReportId: decReport.id,
+        codigoCliente: "7200000002",
+        saldoCredito: "763.26",
+        percentualCompensacao: 100
+      });
+
+      // Add 13 months history
+      const historyMonths = [
+        {m: 12, y: 2024}, {m: 1, y: 2025}, {m: 2, y: 2025}, {m: 3, y: 2025},
+        {m: 4, y: 2025}, {m: 5, y: 2025}, {m: 6, y: 2025}, {m: 7, y: 2025},
+        {m: 8, y: 2025}, {m: 9, y: 2025}, {m: 10, y: 2025}, {m: 11, y: 2025}, {m: 12, y: 2025}
       ];
-      
-      for (const month of months) {
-        await storage.createBillingReport({
-          monthYear: month,
-          energyInjected: (Math.floor(Math.random() * 300) + 400).toString(),
-          energyConsumed: (Math.floor(Math.random() * 200) + 400).toString(),
-          creditBalance: "1526.51",
-          userId: newClient.id
+
+      for (const h of historyMonths) {
+        await storage.createBillingHistory({
+          billingReportId: decReport.id,
+          mes: h.m,
+          ano: h.y,
+          energiaConsumida: (Math.floor(Math.random() * 200) + 400).toString(),
+          energiaInjetada: (Math.floor(Math.random() * 300) + 400).toString(),
+          kwhCompensado: "400",
+          creditoGerado: "150"
         });
       }
     }

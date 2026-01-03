@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, alerts, reports, billingReports, type User, type InsertUser, type Alert, type InsertAlert, type Report, type BillingReport, type InsertBillingReport } from "@shared/schema";
+import { users, alerts, reports, billingReports, billingUnits, billingHistory, type User, type InsertUser, type Alert, type InsertAlert, type Report, type BillingReport, type InsertBillingReport, type BillingUnit, type InsertBillingUnit, type BillingHistory, type InsertBillingHistory } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
@@ -27,6 +27,12 @@ export interface IStorage {
   // Billing Reports
   getBillingReports(userId?: number): Promise<BillingReport[]>;
   createBillingReport(report: InsertBillingReport): Promise<BillingReport>;
+  
+  // New billing data methods
+  getBillingUnits(reportId: number): Promise<BillingUnit[]>;
+  createBillingUnit(unit: InsertBillingUnit): Promise<BillingUnit>;
+  getBillingHistory(reportId: number): Promise<BillingHistory[]>;
+  createBillingHistory(history: InsertBillingHistory): Promise<BillingHistory>;
 
   sessionStore: session.Store;
 }
@@ -116,6 +122,24 @@ export class DatabaseStorage implements IStorage {
   async createBillingReport(report: InsertBillingReport): Promise<BillingReport> {
     const [newReport] = await db.insert(billingReports).values(report).returning();
     return newReport;
+  }
+
+  async getBillingUnits(reportId: number): Promise<BillingUnit[]> {
+    return db.select().from(billingUnits).where(eq(billingUnits.billingReportId, reportId));
+  }
+
+  async createBillingUnit(unit: InsertBillingUnit): Promise<BillingUnit> {
+    const [newUnit] = await db.insert(billingUnits).values(unit).returning();
+    return newUnit;
+  }
+
+  async getBillingHistory(reportId: number): Promise<BillingHistory[]> {
+    return db.select().from(billingHistory).where(eq(billingHistory.billingReportId, reportId));
+  }
+
+  async createBillingHistory(history: InsertBillingHistory): Promise<BillingHistory> {
+    const [newHistory] = await db.insert(billingHistory).values(history).returning();
+    return newHistory;
   }
 }
 

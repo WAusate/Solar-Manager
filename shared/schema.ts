@@ -48,17 +48,46 @@ export const insertReportSchema = createInsertSchema(reports).omit({ id: true })
 
 export const billingReports = pgTable("billing_reports", {
   id: serial("id").primaryKey(),
-  monthYear: text("month_year").notNull(), // e.g. "Dezembro/2025"
-  energyInjected: text("energy_injected").notNull(),
-  energyConsumed: text("energy_consumed").notNull(),
-  creditBalance: text("credit_balance").notNull(),
   userId: integer("user_id").notNull(),
+  mes: integer("mes").notNull(),
+  ano: integer("ano").notNull(),
+  energiaInjetada: text("energia_injetada").notNull(), // text to keep it simple as before or numeric if needed
+  energiaConsumida: text("energia_consumida").notNull(),
+  saldoCredito: text("saldo_credito").notNull(),
+  pdfUrl: text("pdf_url"),
+  monthYear: text("month_year").notNull(), // keeping for compatibility with existing UI
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const billingUnits = pgTable("billing_units", {
+  id: serial("id").primaryKey(),
+  billingReportId: integer("billing_report_id").notNull(),
+  codigoCliente: text("codigo_cliente").notNull(),
+  saldoCredito: text("saldo_credito").notNull(),
+  percentualCompensacao: integer("percentual_compensacao").notNull(),
+});
+
+export const billingHistory = pgTable("billing_history", {
+  id: serial("id").primaryKey(),
+  billingReportId: integer("billing_report_id").notNull(),
+  mes: integer("mes").notNull(),
+  ano: integer("ano").notNull(),
+  energiaConsumida: text("energia_consumida").notNull(),
+  energiaInjetada: text("energia_injetada").notNull(),
+  kwhCompensado: text("kwh_compensado").notNull(),
+  creditoGerado: text("credito_gerado").notNull(),
+});
+
 export const insertBillingReportSchema = createInsertSchema(billingReports).omit({ id: true, createdAt: true });
+export const insertBillingUnitSchema = createInsertSchema(billingUnits).omit({ id: true });
+export const insertBillingHistorySchema = createInsertSchema(billingHistory).omit({ id: true });
+
 export type BillingReport = typeof billingReports.$inferSelect;
 export type InsertBillingReport = z.infer<typeof insertBillingReportSchema>;
+export type BillingUnit = typeof billingUnits.$inferSelect;
+export type InsertBillingUnit = z.infer<typeof insertBillingUnitSchema>;
+export type BillingHistory = typeof billingHistory.$inferSelect;
+export type InsertBillingHistory = z.infer<typeof insertBillingHistorySchema>;
 
 // === TYPES ===
 
