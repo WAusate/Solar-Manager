@@ -46,6 +46,20 @@ export const insertUserSchema = createInsertSchema(users).omit({ id: true });
 export const insertAlertSchema = createInsertSchema(alerts).omit({ id: true, createdAt: true });
 export const insertReportSchema = createInsertSchema(reports).omit({ id: true });
 
+export const billingReports = pgTable("billing_reports", {
+  id: serial("id").primaryKey(),
+  monthYear: text("month_year").notNull(), // e.g. "Dezembro/2025"
+  energyInjected: text("energy_injected").notNull(),
+  energyConsumed: text("energy_consumed").notNull(),
+  creditBalance: text("credit_balance").notNull(),
+  userId: integer("user_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertBillingReportSchema = createInsertSchema(billingReports).omit({ id: true, createdAt: true });
+export type BillingReport = typeof billingReports.$inferSelect;
+export type InsertBillingReport = z.infer<typeof insertBillingReportSchema>;
+
 // === TYPES ===
 
 export type User = typeof users.$inferSelect;

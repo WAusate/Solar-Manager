@@ -118,6 +118,21 @@ export async function registerRoutes(
     res.sendStatus(204);
   });
 
+  // 5. Billing Reports
+  app.get("/api/billing-reports", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    const user = req.user as any;
+    
+    let userId = req.query.userId ? parseInt(req.query.userId as string) : undefined;
+    
+    if (user.role === 'client') {
+      userId = user.id;
+    }
+    
+    const reports = await storage.getBillingReports(userId);
+    res.json(reports);
+  });
+
   // Seed Data (Check and create if missing)
   await seedDatabase();
 
@@ -165,6 +180,26 @@ async function seedDatabase() {
       plantName: "Usina Solar João Silva",
       userId: newClient.id,
     });
+    
+    // Seed Billing Reports for client
+    const existingBilling = await storage.getBillingReports(newClient.id);
+    if (existingBilling.length === 0) {
+      const months = [
+        "Dezembro/2024", "Janeiro/2025", "Fevereiro/2025", "Março/2025",
+        "Abril/2025", "Maio/2025", "Junho/2025", "Julho/2025",
+        "Agosto/2025", "Setembro/2025", "Outubro/2025", "Novembro/2025", "Dezembro/2025"
+      ];
+      
+      for (const month of months) {
+        await storage.createBillingReport({
+          monthYear: month,
+          energyInjected: (Math.floor(Math.random() * 300) + 400).toString(),
+          energyConsumed: (Math.floor(Math.random() * 200) + 400).toString(),
+          creditBalance: "1526.51",
+          userId: newClient.id
+        });
+      }
+    }
     
     // Create an alert for another user (simulated) to test Admin view
     await storage.createAlert({
