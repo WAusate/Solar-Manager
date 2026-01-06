@@ -135,7 +135,20 @@ export async function registerRoutes(
     const enrichedReports = await Promise.all(reports.map(async (report) => {
       const units = await storage.getBillingUnits(report.id);
       const history = await storage.getBillingHistory(report.id);
-      return { ...report, units, history };
+      
+      // Calculate energiaConsumida as the sum of consumoMes from all units
+      let calculatedConsumida = report.energiaConsumida;
+      if (units.length > 0) {
+        const sum = units.reduce((acc, unit) => acc + parseFloat(unit.consumoMes || "0"), 0);
+        calculatedConsumida = sum.toString();
+      }
+
+      return { 
+        ...report, 
+        units, 
+        history,
+        energiaConsumida: calculatedConsumida
+      };
     }));
     
     res.json(enrichedReports);
