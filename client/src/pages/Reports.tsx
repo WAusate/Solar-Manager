@@ -1,7 +1,20 @@
 import { useReports } from "@/hooks/use-reports";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Calendar, TrendingUp, TrendingDown, CreditCard, Activity, Search, User as UserIcon } from "lucide-react";
+import { 
+  FileText, 
+  Download, 
+  Calendar, 
+  TrendingUp, 
+  TrendingDown, 
+  CreditCard, 
+  Activity, 
+  Search, 
+  User as UserIcon,
+  Building2,
+  Home
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useQuery } from "@tanstack/react-query";
