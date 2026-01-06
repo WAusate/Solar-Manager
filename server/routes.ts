@@ -207,15 +207,27 @@ async function seedDatabase() {
       // Add units for Dec 2025
       await storage.createBillingUnit({
         billingReportId: decReport.id,
-        codigoCliente: "7200000001",
-        saldoCredito: "763.25",
-        percentualCompensacao: 100
+        codigoCliente: "98097023",
+        creditosRecebidos: "0",
+        consumoMes: "112",
+        saldoAcumulado: "0",
+        ehGeradora: true
       });
       await storage.createBillingUnit({
         billingReportId: decReport.id,
-        codigoCliente: "7200000002",
-        saldoCredito: "763.26",
-        percentualCompensacao: 100
+        codigoCliente: "7051574928",
+        creditosRecebidos: "272.17",
+        consumoMes: "211",
+        saldoAcumulado: "1019.85",
+        ehGeradora: false
+      });
+      await storage.createBillingUnit({
+        billingReportId: decReport.id,
+        codigoCliente: "7051590516",
+        creditosRecebidos: "272.17",
+        consumoMes: "268",
+        saldoAcumulado: "506.66",
+        ehGeradora: false
       });
 
       // Add 13 months history

@@ -20,6 +20,83 @@ import {
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+interface UnidadeConsumidora {
+  id: number;
+  codigoCliente: string;
+  creditosRecebidos: string;
+  consumoMes: string;
+  saldoAcumulado: string;
+  ehGeradora: boolean;
+}
+
+function UnidadesConsumidoras({ unidades }: { unidades: UnidadeConsumidora[] }) {
+  // Order: Geradora first
+  const sortedUnidades = [...unidades].sort((a, b) => (a.ehGeradora === b.ehGeradora ? 0 : a.ehGeradora ? -1 : 1));
+
+  const formatNumber = (val: string) => {
+    return parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  return (
+    <div className="space-y-4 mt-8">
+      <h2 className="text-xl font-bold text-foreground px-1 flex items-center gap-2">
+        <span>📍 Distribuição de Créditos por Unidade</span>
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {sortedUnidades.map((unit) => (
+          <Card 
+            key={unit.id} 
+            className={`border-none shadow-lg shadow-slate-200/40 hover-elevate transition-all duration-300 ${
+              unit.ehGeradora ? 'bg-primary/5 ring-1 ring-primary/20' : 'bg-white'
+            }`}
+          >
+            <CardContent className="p-5 space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-xl ${unit.ehGeradora ? 'bg-primary/20 text-primary' : 'bg-slate-100 text-slate-500'}`}>
+                    {unit.ehGeradora ? <Building2 className="w-5 h-5" /> : <Home className="w-5 h-5" />}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold text-slate-700">UC {unit.codigoCliente}</p>
+                      {unit.ehGeradora && (
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px] py-0">
+                          Geradora
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3" /> Créditos Recebidos:
+                  </span>
+                  <span className="text-sm font-semibold text-primary">{formatNumber(unit.creditosRecebidos)} kWh</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Activity className="w-3 h-3" /> Consumo do Mês:
+                  </span>
+                  <span className="text-sm font-semibold text-slate-700">{formatNumber(unit.consumoMes)} kWh</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <CreditCard className="w-3 h-3" /> Saldo Acumulado:
+                  </span>
+                  <span className="text-sm font-semibold text-secondary">{formatNumber(unit.saldoAcumulado)} kWh</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Reports() {
   const { user } = useAuth();
   const { data: reports, isLoading: reportsLoading } = useReports();
@@ -30,7 +107,7 @@ export default function Reports() {
     enabled: user?.role === 'admin',
   });
 
-  const { data: billingReports = [], isLoading: billingLoading } = useQuery<(BillingReport & { units: any[], history: any[] })[]>({
+  const { data: billingReports = [], isLoading: billingLoading } = useQuery<(BillingReport & { units: UnidadeConsumidora[], history: any[] })[]>({
     queryKey: ["/api/billing-reports", selectedClientId],
     queryFn: async ({ queryKey }) => {
       const [_key, clientId] = queryKey;
@@ -120,6 +197,11 @@ export default function Reports() {
         </Card>
       )}
 
+      {/* NEW: Unidades Consumidoras Section */}
+      {currentMonthReport && currentMonthReport.units && currentMonthReport.units.length > 0 && (
+        <UnidadesConsumidoras unidades={currentMonthReport.units} />
+      )}
+
       {/* 2. Gráfico de Barras */}
       <Card className="border-none shadow-xl shadow-slate-200/50">
         <CardHeader>
@@ -150,9 +232,9 @@ export default function Reports() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* 3. Tabela Histórico Detalhado */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="space-y-4">
           <h2 className="text-xl font-bold text-foreground px-1">Histórico Detalhado</h2>
           <Card className="border-none shadow-xl shadow-slate-200/50 overflow-hidden">
             <CardContent className="p-0">
@@ -182,32 +264,6 @@ export default function Reports() {
               </div>
             </CardContent>
           </Card>
-        </div>
-
-        {/* 4. Resumo por Unidade Consumidora */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold text-foreground px-1">Unidades Consumidoras</h2>
-          <div className="space-y-4">
-            {currentMonthReport?.units?.map((unit: any) => (
-              <Card key={unit.id} className="border-none shadow-lg shadow-slate-200/40 hover-elevate cursor-default">
-                <CardContent className="p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500">
-                      <Activity className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">UC: {unit.codigoCliente}</p>
-                      <p className="font-bold text-slate-700">Compensação: {unit.percentualCompensacao}%</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-muted-foreground">Saldo</p>
-                    <p className="font-bold text-secondary">{unit.saldoCredito} kWh</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
         </div>
       </div>
     </div>

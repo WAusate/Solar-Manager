@@ -1,0 +1,161 @@
+🎯 Objetivo:
+Adicionar seção de "Unidades Consumidoras" na página de Relatórios, exibindo os dados salvos na tabela billing_units.
+
+📊 Dados Disponíveis no Banco:
+Tabela billing_units:
+
+billing_report_id (relacionamento com billing_reports)
+codigo_cliente (código da UC)
+creditos_recebidos (decimal)
+consumo_mes (decimal)
+saldo_acumulado (decimal)
+eh_geradora (boolean) - identifica a UC geradora
+
+
+🎨 Layout a Implementar:
+Seção: "Distribuição de Créditos por Unidade"
+Posicionar abaixo do card de resumo mensal (após energia injetada/consumida/saldo).
+Estilo: Lista vertical com cards/itens para cada unidade.
+Estrutura de Cada Item:
+[Ícone UC] UC [CÓDIGO] [(Geradora)] se eh_geradora = true
+
+⚡ Créditos Recebidos: [creditos_recebidos] kWh
+🔌 Consumo do Mês: [consumo_mes] kWh
+💰 Saldo Acumulado: [saldo_acumulado] kWh
+Exemplo:
+🏢 UC 98097023 (Geradora)
+   ⚡ Créditos Recebidos: 0 kWh
+   🔌 Consumo do Mês: 112 kWh
+   💰 Saldo Acumulado: 0 kWh
+
+🏠 UC 7051574928
+   ⚡ Créditos Recebidos: 272.17 kWh
+   🔌 Consumo do Mês: 211 kWh
+   💰 Saldo Acumulado: 1,019.85 kWh
+
+🔧 Requisitos Técnicos:
+1. Query no Backend:
+Ao buscar dados de faturamento, fazer JOIN com billing_units:
+sqlSELECT 
+  br.*,
+  json_agg(
+    json_build_object(
+      'codigo', bu.codigo_cliente,
+      'creditos_recebidos', bu.creditos_recebidos,
+      'consumo_mes', bu.consumo_mes,
+      'saldo_acumulado', bu.saldo_acumulado,
+      'eh_geradora', bu.eh_geradora
+    )
+  ) as unidades
+FROM billing_reports br
+LEFT JOIN billing_units bu ON bu.billing_report_id = br.id
+WHERE br.user_id = [USER_ID] AND br.mes = [MES] AND br.ano = [ANO]
+GROUP BY br.id;
+2. Estrutura de Dados Esperada:
+typescriptinterface BillingReport {
+  id: number;
+  mes: number;
+  ano: number;
+  energia_injetada: number;
+  energia_consumida: number;
+  saldo_credito: number;
+  unidades: UnidadeConsumidora[];
+}
+
+interface UnidadeConsumidora {
+  codigo: string;
+  creditos_recebidos: number;
+  consumo_mes: number;
+  saldo_acumulado: number;
+  eh_geradora: boolean;
+}
+3. Componente Frontend:
+Criar componente UnidadesConsumidoras que recebe array de unidades.
+Props:
+typescriptinterface UnidadesConsumidorasProps {
+  unidades: UnidadeConsumidora[];
+}
+
+🎨 Especificações Visuais:
+Container Principal:
+
+Título: "📍 Distribuição de Créditos por Unidade"
+Espaçamento: margin-top após card de resumo mensal
+
+Item de Unidade:
+
+Se eh_geradora = true:
+
+Ícone: 🏢
+Badge: "(Geradora)" com cor destacada
+Opcional: Background diferenciado
+
+
+Se eh_geradora = false:
+
+Ícone: 🏠
+Sem badge
+
+
+
+Formatação de Valores:
+
+Números com 2 casas decimais
+Separador de milhar (1.019,85 ou 1,019.85 dependendo do locale)
+Unidade "kWh" após cada valor
+
+Espaçamento:
+
+Entre unidades: margin-bottom médio
+Entre linhas de dados: padding pequeno
+Ícones alinhados com texto
+
+
+📱 Responsividade:
+
+Desktop: Lista vertical com cards lado a lado (opcional)
+Mobile: Lista vertical empilhada
+Tablet: Adaptar conforme espaço
+
+
+✅ Checklist de Implementação:
+
+ Atualizar query do backend para incluir unidades
+ Criar interface/type TypeScript (se aplicável)
+ Criar componente UnidadesConsumidoras
+ Adicionar na página de Relatórios
+ Renderizar lista de unidades
+ Aplicar estilos (ícones, badges, formatação)
+ Destacar visualmente a UC geradora
+ Formatar valores numéricos corretamente
+ Testar responsividade
+ Validar com dados reais do banco
+
+
+🧪 Dados de Teste:
+Usar o registro salvo no banco:
+
+UC 98097023 (Geradora): 0 / 112 / 0
+UC 7051574928: 272.17 / 211 / 1019.85
+UC 7051590516: 272.17 / 268 / 506.66
+
+
+📝 Observações Importantes:
+
+Badge "(Geradora)" deve ser visualmente destacado
+Manter consistência com design atual do sistema
+Usar mesmo padrão de cores e tipografia
+Considerar caso de nenhuma unidade (não deve acontecer, mas tratar)
+Ordenar: Geradora primeiro, depois demais UCs
+
+
+🎯 Resultado Esperado:
+Ao acessar a página de Relatórios, o usuário deve ver:
+
+Card de resumo mensal (já existe)
+Nova seção de Unidades Consumidoras (implementar)
+Cada UC listada com seus dados claros e formatados
+UC geradora visualmente destacada
+
+
+Execute essas implementações.

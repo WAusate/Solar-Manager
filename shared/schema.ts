@@ -63,8 +63,10 @@ export const billingUnits = pgTable("billing_units", {
   id: serial("id").primaryKey(),
   billingReportId: integer("billing_report_id").notNull(),
   codigoCliente: text("codigo_cliente").notNull(),
-  saldoCredito: text("saldo_credito").notNull(),
-  percentualCompensacao: integer("percentual_compensacao").notNull(),
+  creditosRecebidos: text("creditos_recebidos").notNull().default("0"),
+  consumoMes: text("consumo_mes").notNull().default("0"),
+  saldoAcumulado: text("saldo_acumulado").notNull().default("0"),
+  ehGeradora: boolean("eh_geradora").notNull().default(false),
 });
 
 export const billingHistory = pgTable("billing_history", {
