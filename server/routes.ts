@@ -143,11 +143,20 @@ export async function registerRoutes(
         calculatedConsumida = sum.toString();
       }
 
+      // Format monthYear dynamically in PT-BR (e.g., Dezembro/2025)
+      const months = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+      ];
+      const monthName = months[report.mes - 1] || "Janeiro";
+      const formattedMonthYear = `${monthName}/${report.ano}`;
+
       return { 
         ...report, 
         units, 
         history,
-        energiaConsumida: calculatedConsumida
+        energiaConsumida: calculatedConsumida,
+        monthYear: formattedMonthYear
       };
     }));
     
