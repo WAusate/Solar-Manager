@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { User } from "@shared/schema";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -76,6 +76,27 @@ export default function Clients() {
   const { data: clients = [], isLoading } = useQuery<User[]>({
     queryKey: ["/api/clients"],
   });
+
+  useEffect(() => {
+    if (!isDialogOpen) {
+      // Delay cleanup to after the modal close animation finishes
+      const timer = setTimeout(() => {
+        setEditingClient(null);
+        form.reset({
+          name: "",
+          username: "",
+          password: "",
+          cpfCnpj: "",
+          phone: "",
+          plantAddress: "",
+          plantCapacity: "",
+          ucCode: "",
+          status: "active",
+        });
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isDialogOpen, form]);
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientFormSchema),
@@ -181,23 +202,7 @@ export default function Clients() {
           <p className="text-muted-foreground mt-1">Cadastre e gerencie os clientes do sistema</p>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={(open) => {
-          if (!open) {
-            setEditingClient(null);
-            form.reset({
-              name: "",
-              username: "",
-              password: "",
-              cpfCnpj: "",
-              phone: "",
-              plantAddress: "",
-              plantCapacity: "",
-              ucCode: "",
-              status: "active",
-            });
-          }
-          setIsDialogOpen(open);
-        }}>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="rounded-xl shadow-lg shadow-primary/20">
               <Plus className="w-4 h-4 mr-2" />
