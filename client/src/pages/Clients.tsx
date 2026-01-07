@@ -97,17 +97,7 @@ export default function Clients() {
       // Delay cleanup to after the modal close animation finishes
       const timer = setTimeout(() => {
         setEditingClient(null);
-        form.reset({
-          name: "",
-          username: "",
-          password: "",
-          cpfCnpj: "",
-          phone: "",
-          plantAddress: "",
-          plantCapacity: "",
-          ucCode: "",
-          status: "active",
-        });
+        form.reset();
       }, 300);
       return () => clearTimeout(timer);
     }
