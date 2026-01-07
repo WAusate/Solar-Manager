@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, alerts, reports, billingReports, billingUnits, billingHistory, type User, type InsertUser, type Alert, type InsertAlert, type Report, type BillingReport, type InsertBillingReport, type BillingUnit, type InsertBillingUnit, type BillingHistory, type InsertBillingHistory } from "@shared/schema";
-import { eq, desc } from "drizzle-orm";
+import { users, alerts, reports, billingReports, billingUnits, billingHistory, unitNicknames, type User, type InsertUser, type Alert, type InsertAlert, type Report, type BillingReport, type InsertBillingReport, type BillingUnit, type InsertBillingUnit, type BillingHistory, type InsertBillingHistory, type UnitNickname, type InsertUnitNickname } from "@shared/schema";
+import { eq, desc, and } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
@@ -33,6 +33,10 @@ export interface IStorage {
   createBillingUnit(unit: InsertBillingUnit): Promise<BillingUnit>;
   getBillingHistory(reportId: number): Promise<BillingHistory[]>;
   createBillingHistory(history: InsertBillingHistory): Promise<BillingHistory>;
+
+  // Unit Nicknames
+  getUnitNicknames(userId: number): Promise<UnitNickname[]>;
+  upsertUnitNickname(nickname: InsertUnitNickname): Promise<UnitNickname>;
 
   sessionStore: session.Store;
 }
@@ -140,6 +144,30 @@ export class DatabaseStorage implements IStorage {
   async createBillingHistory(history: InsertBillingHistory): Promise<BillingHistory> {
     const [newHistory] = await db.insert(billingHistory).values(history).returning();
     return newHistory;
+  }
+
+  async getUnitNicknames(userId: number): Promise<UnitNickname[]> {
+    return db.select().from(unitNicknames).where(eq(unitNicknames.userId, userId));
+  }
+
+  async upsertUnitNickname(nickname: InsertUnitNickname): Promise<UnitNickname> {
+    const [existing] = await db.select().from(unitNicknames).where(
+      and(
+        eq(unitNicknames.userId, nickname.userId),
+        eq(unitNicknames.unitCode, nickname.unitCode)
+      )
+    );
+
+    if (existing) {
+      const [updated] = await db.update(unitNicknames)
+        .set({ nickname: nickname.nickname })
+        .where(eq(unitNicknames.id, existing.id))
+        .returning();
+      return updated;
+    }
+
+    const [newNickname] = await db.insert(unitNicknames).values(nickname).returning();
+    return newNickname;
   }
 }
 

@@ -131,10 +131,25 @@ export async function registerRoutes(
     
     const reports = await storage.getBillingReports(userId);
     
+    // Get nicknames for all users involved if admin, or just current user
+    const userNicknamesMap = new Map<number, any>();
+
     // Enrich reports with units and history if requested
     const enrichedReports = await Promise.all(reports.map(async (report) => {
       const units = await storage.getBillingUnits(report.id);
       const history = await storage.getBillingHistory(report.id);
+      
+      // Get nicknames for this report's user
+      if (!userNicknamesMap.has(report.userId)) {
+        const nicknames = await storage.getUnitNicknames(report.userId);
+        userNicknamesMap.set(report.userId, nicknames);
+      }
+      const nicknames = userNicknamesMap.get(report.userId);
+
+      const unitsWithNicknames = units.map(unit => {
+        const nicknameObj = nicknames.find((n: any) => n.unitCode === unit.codigoCliente);
+        return { ...unit, nickname: nicknameObj?.nickname };
+      });
       
       // Calculate energiaConsumida as the sum of consumoMes from all units
       let calculatedConsumida = report.energiaConsumida;
@@ -153,7 +168,7 @@ export async function registerRoutes(
 
       return { 
         ...report, 
-        units, 
+        units: unitsWithNicknames, 
         history,
         energiaConsumida: calculatedConsumida,
         monthYear: formattedMonthYear
@@ -161,6 +176,28 @@ export async function registerRoutes(
     }));
     
     res.json(enrichedReports);
+  });
+
+  app.post("/api/unit-nicknames", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    const user = req.user as any;
+    
+    // Admins can set nicknames for any user, clients only for themselves
+    let userId = user.id;
+    if (user.role === 'admin' && req.body.userId) {
+      userId = parseInt(req.body.userId);
+    }
+
+    try {
+      const nickname = await storage.upsertUnitNickname({
+        userId,
+        unitCode: req.body.unitCode,
+        nickname: req.body.nickname
+      });
+      res.json(nickname);
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
   });
 
   // Seed Data (Check and create if missing)

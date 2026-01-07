@@ -12,14 +12,17 @@ import {
   Search, 
   User as UserIcon,
   Building2,
-  Home
+  Home,
+  Pencil
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { BillingReport, User } from "@shared/schema";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { 
   BarChart, 
   Bar, 
@@ -30,8 +33,11 @@ import {
   Legend, 
   ResponsiveContainer 
 } from "recharts";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface UnidadeConsumidora {
   id: number;
@@ -40,14 +46,45 @@ interface UnidadeConsumidora {
   consumoMes: string;
   saldoAcumulado: string;
   ehGeradora: boolean;
+  nickname?: string;
 }
 
-function UnidadesConsumidoras({ unidades }: { unidades: UnidadeConsumidora[] }) {
+function UnidadesConsumidoras({ unidades, userId }: { unidades: UnidadeConsumidora[], userId: number }) {
+  const { toast } = useToast();
+  const [editingUnit, setEditingUnit] = useState<UnidadeConsumidora | null>(null);
+  const [newNickname, setNewNickname] = useState("");
+
   // Order: Geradora first
   const sortedUnidades = [...unidades].sort((a, b) => (a.ehGeradora === b.ehGeradora ? 0 : a.ehGeradora ? -1 : 1));
 
   const formatNumber = (val: string) => {
     return parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  const nicknameMutation = useMutation({
+    mutationFn: async ({ unitCode, nickname }: { unitCode: string, nickname: string }) => {
+      const res = await apiRequest("POST", "/api/unit-nicknames", { userId, unitCode, nickname });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/billing-reports"] });
+      toast({ title: "Sucesso", description: "Apelido atualizado com sucesso" });
+      setEditingUnit(null);
+    },
+    onError: (error: Error) => {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    }
+  });
+
+  const handleEditNickname = (unit: UnidadeConsumidora) => {
+    setEditingUnit(unit);
+    setNewNickname(unit.nickname || "");
+  };
+
+  const saveNickname = () => {
+    if (editingUnit) {
+      nicknameMutation.mutate({ unitCode: editingUnit.codigoCliente, nickname: newNickname });
+    }
   };
 
   return (
@@ -70,12 +107,27 @@ function UnidadesConsumidoras({ unidades }: { unidades: UnidadeConsumidora[] }) 
                     {unit.ehGeradora ? <Building2 className="w-5 h-5" /> : <Home className="w-5 h-5" />}
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-bold text-slate-700">UC {unit.codigoCliente}</p>
-                      {unit.ehGeradora && (
-                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px] py-0">
-                          Geradora
-                        </Badge>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <p className="font-bold text-slate-700 leading-tight">
+                          {unit.nickname || `UC ${unit.codigoCliente}`}
+                        </p>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6 text-slate-400 hover:text-primary"
+                          onClick={() => handleEditNickname(unit)}
+                        >
+                          <Pencil className="w-3 h-3" />
+                        </Button>
+                        {unit.ehGeradora && (
+                          <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px] py-0">
+                            Geradora
+                          </Badge>
+                        )}
+                      </div>
+                      {unit.nickname && (
+                        <span className="text-xs text-muted-foreground">UC {unit.codigoCliente}</span>
                       )}
                     </div>
                   </div>
@@ -106,6 +158,31 @@ function UnidadesConsumidoras({ unidades }: { unidades: UnidadeConsumidora[] }) 
           </Card>
         ))}
       </div>
+
+      <Dialog open={!!editingUnit} onOpenChange={(open) => !open && setEditingUnit(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Definir Apelido para UC {editingUnit?.codigoCliente}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="nickname">Apelido (ex: Casa, Sítio, Empresa)</Label>
+              <Input 
+                id="nickname" 
+                value={newNickname} 
+                onChange={(e) => setNewNickname(e.target.value)}
+                placeholder="Digite o apelido..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingUnit(null)}>Cancelar</Button>
+            <Button onClick={saveNickname} disabled={nicknameMutation.isPending}>
+              Salvar Apelido
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -212,7 +289,7 @@ export default function Reports() {
 
       {/* NEW: Unidades Consumidoras Section */}
       {currentMonthReport && currentMonthReport.units && currentMonthReport.units.length > 0 && (
-        <UnidadesConsumidoras unidades={currentMonthReport.units} />
+        <UnidadesConsumidoras unidades={currentMonthReport.units} userId={currentMonthReport.userId} />
       )}
 
       {/* 2. Gráfico de Barras */}

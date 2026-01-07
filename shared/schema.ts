@@ -66,9 +66,20 @@ export const billingUnits = pgTable("billing_units", {
   codigoCliente: text("codigo_cliente").notNull(),
   creditosRecebidos: text("creditos_recebidos").notNull().default("0"),
   consumoMes: text("consumo_mes").notNull().default("0"),
-  saldoAcumulado: text("saldo_acumulado").notNull().default("0"),
+  saldoAcumulado: text("saldo_accumulado").notNull().default("0"),
   ehGeradora: boolean("eh_geradora").notNull().default(false),
 });
+
+export const unitNicknames = pgTable("unit_nicknames", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  unitCode: text("unit_code").notNull(),
+  nickname: text("nickname").notNull(),
+});
+
+export const insertUnitNicknameSchema = createInsertSchema(unitNicknames).omit({ id: true });
+export type UnitNickname = typeof unitNicknames.$inferSelect;
+export type InsertUnitNickname = z.infer<typeof insertUnitNicknameSchema>;
 
 export const billingHistory = pgTable("billing_history", {
   id: serial("id").primaryKey(),
