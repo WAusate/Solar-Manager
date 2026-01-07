@@ -66,7 +66,7 @@ export const billingUnits = pgTable("billing_units", {
   codigoCliente: text("codigo_cliente").notNull(),
   creditosRecebidos: text("creditos_recebidos").notNull().default("0"),
   consumoMes: text("consumo_mes").notNull().default("0"),
-  saldoAcumulado: text("saldo_accumulado").notNull().default("0"),
+  saldoAcumulado: text("saldo_acumulado").notNull().default("0"),
   ehGeradora: boolean("eh_geradora").notNull().default(false),
 });
 
