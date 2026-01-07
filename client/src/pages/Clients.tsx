@@ -61,6 +61,7 @@ const clientFormSchema = z.object({
   phone: z.string().optional(),
   plantAddress: z.string().optional(),
   plantCapacity: z.string().optional(),
+  ucCode: z.string().optional(),
   status: z.enum(["active", "inactive"]),
 });
 
@@ -86,6 +87,7 @@ export default function Clients() {
       phone: "",
       plantAddress: "",
       plantCapacity: "",
+      ucCode: "",
       status: "active",
     },
   });
@@ -158,6 +160,7 @@ export default function Clients() {
       phone: client.phone || "",
       plantAddress: client.plantAddress || "",
       plantCapacity: client.plantCapacity || "",
+      ucCode: client.ucCode || "",
       status: (client.status as any) || "active",
     });
     setIsDialogOpen(true);
@@ -271,6 +274,19 @@ export default function Clients() {
                         <FormLabel>Capacidade da Usina (kWp)</FormLabel>
                         <FormControl>
                           <Input {...field} placeholder="5.4" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="ucCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>UC Principal (Geradora)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="98097023" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

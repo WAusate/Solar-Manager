@@ -15,6 +15,7 @@ export const users = pgTable("users", {
   phone: text("phone"),
   plantAddress: text("plant_address"),
   plantCapacity: text("plant_capacity"), // kWp
+  ucCode: text("uc_code"),
   status: text("status", { enum: ["active", "inactive"] }).notNull().default("active"),
 });
 
