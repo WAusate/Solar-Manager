@@ -182,11 +182,21 @@ export default function Clients() {
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={(open) => {
-          setIsDialogOpen(open);
           if (!open) {
             setEditingClient(null);
-            form.reset();
+            form.reset({
+              name: "",
+              username: "",
+              password: "",
+              cpfCnpj: "",
+              phone: "",
+              plantAddress: "",
+              plantCapacity: "",
+              ucCode: "",
+              status: "active",
+            });
           }
+          setIsDialogOpen(open);
         }}>
           <DialogTrigger asChild>
             <Button className="rounded-xl shadow-lg shadow-primary/20">
