@@ -77,6 +77,21 @@ export default function Clients() {
     queryKey: ["/api/clients"],
   });
 
+  const form = useForm<ClientFormValues>({
+    resolver: zodResolver(clientFormSchema),
+    defaultValues: {
+      name: "",
+      username: "",
+      password: "",
+      cpfCnpj: "",
+      phone: "",
+      plantAddress: "",
+      plantCapacity: "",
+      ucCode: "",
+      status: "active",
+    },
+  });
+
   useEffect(() => {
     if (!isDialogOpen) {
       // Delay cleanup to after the modal close animation finishes
@@ -97,21 +112,6 @@ export default function Clients() {
       return () => clearTimeout(timer);
     }
   }, [isDialogOpen, form]);
-
-  const form = useForm<ClientFormValues>({
-    resolver: zodResolver(clientFormSchema),
-    defaultValues: {
-      name: "",
-      username: "",
-      password: "",
-      cpfCnpj: "",
-      phone: "",
-      plantAddress: "",
-      plantCapacity: "",
-      ucCode: "",
-      status: "active",
-    },
-  });
 
   const createMutation = useMutation({
     mutationFn: async (values: ClientFormValues) => {
